@@ -1,9 +1,13 @@
 GO_FILES := $(shell find . -name '*.go')
 TARGET := treesitter-go-ts-perf
 
-.PHONY: all build test clean submodule-init
+.PHONY: all build test clean submodule-init setup
 
-all: build
+all: setup build
+
+setup:
+	go mod tidy
+	go mod download
 
 build: build-O0 build-O2 build-O3
 
