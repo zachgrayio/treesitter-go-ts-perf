@@ -41,3 +41,5 @@ Thumbs.db
 
 # Go binaries
 treesitter-go-ts-perf-*
+
+*.prof

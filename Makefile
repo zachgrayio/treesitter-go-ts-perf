@@ -1,7 +1,8 @@
 GO_FILES := $(shell find . -name '*.go')
 TARGET := treesitter-go-ts-perf
+PROFILE_OUT := cpu.prof
 
-.PHONY: all build test clean submodule-init setup
+.PHONY: all build test clean submodule-init setup profile profile-server
 
 all: setup build
 
@@ -24,7 +25,13 @@ test: build
 	hyperfine --warmup 1 --runs 10 "./$(TARGET)-O0 angular Babylon.js" "./$(TARGET)-O2 angular Babylon.js" "./$(TARGET)-O3 angular Babylon.js"
 
 clean:
-	rm -f $(TARGET)-O0 $(TARGET)-O2 $(TARGET)-O3
+	rm -f $(TARGET)-O0 $(TARGET)-O2 $(TARGET)-O3 $(PROFILE_OUT)
 
 submodule-init:
 	git submodule update --init --recursive --depth 1
+
+profile: build-O0
+	./$(TARGET)-O0 -cpuprofile=$(PROFILE_OUT) angular Babylon.js
+
+profile-server:
+	go tool pprof -http=:8080 $(PROFILE_OUT)

@@ -2,10 +2,12 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
 	"path/filepath"
+	"runtime/pprof"
 	"sync"
 	"time"
 
@@ -16,12 +18,24 @@ import (
 const MaxWorkers = 12
 
 func main() {
-	if len(os.Args) < 2 {
-		log.Fatalf("Usage: %s <directory> [<directory>...]", os.Args[0])
+	cpuprofile := flag.String("cpuprofile", "", "write cpu profile to file")
+	flag.Parse()
+
+	if len(flag.Args()) < 1 {
+		log.Fatalf("Usage: %s [--cpuprofile file] <directory> [<directory>...]", os.Args[0])
+	}
+
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
 	}
 
 	var files []string
-	for _, dir := range os.Args[1:] {
+	for _, dir := range flag.Args() {
 		dirFiles, err := getTSFiles(dir)
 		if err != nil {
 			log.Fatalf("Failed to get TypeScript files from %s: %v", dir, err)
