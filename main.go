@@ -13,7 +13,7 @@ import (
 	"github.com/smacker/go-tree-sitter/typescript/typescript"
 )
 
-const MaxWorkers = 4
+const MaxWorkers = 12
 
 func main() {
 	if len(os.Args) < 2 {
